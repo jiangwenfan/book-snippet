@@ -1,12 +1,16 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from user.views import UserViewSet
+from snippet.views import SnippetViewSet, CategoryViewSet, SnippetLabelViewSet
 
 
 router = routers.DefaultRouter()
 
-# TODO 注册路由
-# router.register(r'users', UserViewSet)
+router.register(r"users", UserViewSet)
+router.register(r"snippets", SnippetViewSet)
+router.register(r"categories", CategoryViewSet)
+router.register(r"labels", SnippetLabelViewSet)
 
 
 urlpatterns = [

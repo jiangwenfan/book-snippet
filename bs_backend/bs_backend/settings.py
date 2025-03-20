@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import dotenv_values, find_dotenv
 import logging
 import os
+from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +47,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# AUTH_USER_MODEL = "user.User"
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -88,8 +90,18 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "bs_backend.authentication.BSJWTAuthentication",
     ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+SIMPLE_JWT = {
+    # It will work instead of the default serializer(TokenObtainPairSerializer).
+    # "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.MyTokenObtainPairSerializer",
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    # "SIGNING_KEY": SIGN_KEY,
 }
 
 # cors配置

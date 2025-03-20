@@ -1,8 +1,97 @@
+###
+@id_token = 123
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ1MDUzMjExLCJpYXQiOjE3NDI0NjEyMTEsImp0aSI6ImRmNzY2NjVmZGY3ZDQ1ZmRiMzE0ZGQ0OWU3NDA0NzMwIiwidXNlcl9pZCI6MSwidXNlcl9uYW1lIjoiIn0.zNqgXmWOADckWKbaNmR-9mKw68YENawZNpHP0RT9i1M
+### 
+# test login
+POST http://localhost:8080/users/login/
+Content-Type: application/json
+
+{
+    "email":"123@qq.com",
+    "password":"123"
+}
+
 ### 
 # mobile google 登陆,返回token
-POST http://localhost:8080/login-oauth2-google
+GET http://localhost:8080/users/login-oauth2-google?id_token={{id_token}}
 Content-Type: application/json
 
 {
     "code": "123"
+}
+
+###
+# get all categories
+GET http://localhost:8080/categories/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ1MDUzMjExLCJpYXQiOjE3NDI0NjEyMTEsImp0aSI6ImRmNzY2NjVmZGY3ZDQ1ZmRiMzE0ZGQ0OWU3NDA0NzMwIiwidXNlcl9pZCI6MSwidXNlcl9uYW1lIjoiIn0.zNqgXmWOADckWKbaNmR-9mKw68YENawZNpHP0RT9i1M
+
+
+###
+POST http://localhost:8080/categories/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name":"test1"
+}
+
+###
+DELETE http://localhost:8080/categories/1/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+# get all labels
+GET http://localhost:8080/labels/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+###
+POST http://localhost:8080/labels/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name":"test2"
+}
+
+###
+DELETE http://localhost:8080/labels/1/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+###
+# get all snippets
+GET http://localhost:8080/snippets/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+###
+# get all snippets
+GET http://localhost:8080/snippets/?category=2
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+# get all snippets
+GET http://localhost:8080/snippets/?labels=2
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:8080/snippets/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "text":"4预洗的即食果蔬在生产过程中经过严格的清洗和消毒程序，通常比普通家庭清洗更彻底。",
+    "category":2,
+    "labels_text":[
+        "label1",
+        "label2"
+    ]
 }
