@@ -19,7 +19,7 @@ class ContentPage extends HookWidget {
           ),
           Item(text: "在这个世界上，有一种爱情，是不需要言语的。它是一种默契，一种默契的默契，一种默契的默契的默契。"),
           Item(text: "在这个世界上，有一种爱情，是不需要言语的。"),
-          // BottomInfoBase(widget1: null, widget2: null),
+          //
           // BottomInfo(count: 154),
           AddItem(),
         ],

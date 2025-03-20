@@ -2,8 +2,20 @@ import 'package:bs_mobile/home/content_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bs_mobile/login/index_page.dart';
 import 'package:bs_mobile/home/category_page.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:bs_mobile/utils.dart';
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // 保持启动页
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // init 1. 获取token
+  final String? token = await TokenOp.readToken();
+  print("启动: token: $token");
+
+  // 移除启动页
+  FlutterNativeSplash.remove();
   runApp(const MyApp());
 }
 

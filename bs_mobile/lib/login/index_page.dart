@@ -1,10 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:bs_mobile/utils.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:bs_mobile/api_data.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // 登陆首页
 class LoginIndexPage extends HookWidget {
-  const LoginIndexPage({super.key});
+  final GoogleSignIn googleSign = GoogleSignIn();
+
+  LoginIndexPage({super.key});
+
+  void _showIOSBottomSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          // title: const Text("标题"),
+          // message: const Text("这是一个RiOS风格的Bottom Sheet"),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.pop(context),
+              // isDefaultAction: true,
+              child: const Text("通过 手机 登陆"),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                print("通过 google 登陆");
+                try {
+                  final GoogleSignInAccount? account =
+                      await googleSign.signIn();
+                  if (account == null) {
+                    return;
+                  }
+
+                  final GoogleSignInAuthentication authentication =
+                      await account.authentication;
+                  final String? idToken = authentication.idToken;
+                  if (idToken == null) {
+                    return;
+                  }
+
+                  print("想后端发送idToken.....${idToken}");
+                  final response = await ApiData.googleLogin(idToken);
+                  // {token: xxxx}
+                  final responseData = response as Map<String, dynamic>;
+                  print("google登陆成功...${responseData}");
+
+                  // 将token存储起来
+                  await TokenOp.writeToken(responseData["token"]);
+                } catch (e) {
+                  print("google登陆错误...${e}");
+                }
+              },
+              // isDestructiveAction: true,
+              child: const Text("通过 google 登陆"),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("取消"),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BasePage(
@@ -42,8 +104,9 @@ class LoginIndexPage extends HookWidget {
           Container(
             margin: EdgeInsets.only(top: 40),
             child: TextButton(
-              onPressed: () {
+              onPressed: () async {
                 print("其他登陆方式");
+                _showIOSBottomSheet(context);
               },
               child: Text(
                 "其他登陆方式",
@@ -86,6 +149,13 @@ class ReadmeWidget extends HookWidget {
         ),
       ],
     );
+  }
+}
+
+class GoogleSign extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
 

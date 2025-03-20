@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // 全局基础页面
 class BasePage extends HookWidget {
@@ -12,9 +13,11 @@ class BasePage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false, // ios风格，关闭居中标题
+        toolbarHeight: 130,
         // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: title,
       ),
+
       body: widget,
     );
   }
@@ -46,6 +49,7 @@ class TitleWidget extends HookWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
+      textAlign: TextAlign.start,
       style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
     );
   }
@@ -64,7 +68,6 @@ class BottomInfoBase extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
       height: 100,
       decoration: BoxDecoration(color: Colors.grey),
       child: Row(
@@ -157,5 +160,18 @@ class AddItem extends HookWidget {
         ],
       ),
     );
+  }
+}
+
+// 将token存储起来
+class TokenOp {
+  static final FlutterSecureStorage storage = FlutterSecureStorage();
+
+  static Future<void> writeToken(String token) async {
+    await storage.write(key: "token", value: token);
+  }
+
+  static Future<String?> readToken() async {
+    return await storage.read(key: "token");
   }
 }

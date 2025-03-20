@@ -62,7 +62,7 @@ class UserViewSet(ModelViewSet):
         # 解析、验证google id token
         try:
             google_info = id_token.verify_oauth2_token(
-                id_token, requests.Request(), settings.GOOGLE_CLIENT_ID
+                google_id_token, requests.Request(), settings.GOOGLE_CLIENT_ID
             )
         except ValueError as e:
             logging.warning(

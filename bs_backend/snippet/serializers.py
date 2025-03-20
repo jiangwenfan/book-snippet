@@ -55,6 +55,8 @@ class CategorySerializer(ModelSerializer):
             "name",
             "created_dt",
             "updated_dt",
+            # TODO 增加，表示每个category下的snippet数量
+            # "count",
         ]
 
     def validate(self, attrs):
