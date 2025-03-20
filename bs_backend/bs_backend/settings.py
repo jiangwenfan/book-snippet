@@ -21,6 +21,10 @@ if find_dotenv(env_path):
     MYSQL_USER = env_values.get("MYSQL_USER")
     MYSQL_PASSWORD = env_values.get("MYSQL_PASSWORD")
     MYSQL_DATABASE = env_values.get("MYSQL_DATABASE")
+    # google
+    GOOGLE_CLIENT_ID = env_values.get("GOOGLE_CLIENT_ID")
+    # url
+    IMAGE_BASE_URL = env_values.get("IMAGE_BASE_URL")
 else:
     # 从环境变量中获取配置
     # MySql
@@ -29,6 +33,10 @@ else:
     MYSQL_USER = os.getenv("MYSQL_USER")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
     MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+    # google
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    # url
+    IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL")
 
 
 SECRET_KEY = "django-insecure-yuf$5dp72akchmepvw1&j^y_q1jw-hste)=1f^c#!gwt*(rvcc"
@@ -50,7 +58,8 @@ INSTALLED_APPS = [
     "django_filters",  # filter app
     "corsheaders",  # cors app
     "django_extensions",  # execute app
-    "app1",
+    "snippet",
+    "user",
 ]
 
 # 数据库配置

@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "log",
+            "type": "shell",
+            "command": "docker logs -f bs-backend",
+            "problemMatcher": []
+        },
+        {
+            "label": "shell",
+            "type": "shell",
+            "command": "docker exec -it bs-backend /bin/bash",
+            "problemMatcher": []
+        },
+        {
+            "label": "py-shell",
+            "type": "shell",
+            "command": "docker exec -it bs-backend python manage.py shell",
+            "problemMatcher": []
+        },
+        {
+            "label": "restart",
+            "type": "shell",
+            "command": "docker compose down && docker compose up -d",
+            "problemMatcher": []
+        }
+    ]
+}

@@ -1,26 +1,21 @@
 services:
-  backend:
-    container_name: backend
+  bs_backend:
+    container_name: bs-backend
     build: . 
-    image: redk/object:v2.0
+    image: bs-backend:latest
     restart: unless-stopped
     env_file: .env
-    expose:
-      - 8000
-    extra_hosts:
-      # /etc/hosts # 连接kafka的对应关系
-      - "UEBA-Node:192.168.90.167"
-      - "UEBA-Flink01:192.168.90.168"
-      - "UEBA-ClickHouse:192.168.90.149"
+    ports:
+      - "8080:8000"
     volumes:
-      - ./objectApplication:/objectApplication # 仅测试环境，k8s上不需要这个
-      - statics:/objectApplication/statics
-      # - log:/objectApplication/media # 仅测试环境，k8s上不需要这个
-      # - redk-objectApplication-log:/var/log/gunicorn
+      - .:/bs_backend
     networks:
-      - redk-network
+      - bs-network
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
+        max-size: "2m"
         max-file: "3"
+
+networks:
+  bs-network:
