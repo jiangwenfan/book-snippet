@@ -3,6 +3,9 @@ from dotenv import dotenv_values, find_dotenv
 import logging
 import os
 from datetime import timedelta
+from bs_backend.utils import ESClient
+
+import sentry_sdk
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,10 +25,23 @@ if find_dotenv(env_path):
     MYSQL_USER = env_values.get("MYSQL_USER")
     MYSQL_PASSWORD = env_values.get("MYSQL_PASSWORD")
     MYSQL_DATABASE = env_values.get("MYSQL_DATABASE")
+    # redis
+    REDIS_HOST = env_values.get("REDIS_HOST")
+    REDIS_PORT = env_values.get("REDIS_PORT")
+    REDIS_DB_CELERY = env_values.get("REDIS_DB_CELERY")
+    # es
+    ES_HOST = env_values.get("ES_HOST")
+    ES_PORT = env_values.get("ES_PORT")
+    ES_USER = env_values.get("ES_USER")
+    ES_PASSWORD = env_values.get("ES_PASSWORD")
+    ES_INDEX_NAME = env_values.get("ES_INDEX_NAME")
     # google
     GOOGLE_CLIENT_ID = env_values.get("GOOGLE_CLIENT_ID")
     # url
     IMAGE_BASE_URL = env_values.get("IMAGE_BASE_URL")
+    # sentry
+    sentry_dsn = env_values.get("SENTRY_DSN")
+    DEBUG: bool = env_values.get("DEBUG") == "True"
 else:
     # 从环境变量中获取配置
     # MySql
@@ -34,10 +50,23 @@ else:
     MYSQL_USER = os.getenv("MYSQL_USER")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
     MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+    # redis
+    REDIS_HOST = os.getenv("REDIS_HOST")
+    REDIS_PORT = os.getenv("REDIS_PORT")
+    REDIS_DB_CELERY = os.getenv("REDIS_DB_CELERY")
+    # es
+    ES_HOST = os.getenv("ES_HOST")
+    ES_PORT = os.getenv("ES_PORT")
+    ES_USER = os.getenv("ES_USER")
+    ES_PASSWORD = os.getenv("ES_PASSWORD")
+    ES_INDEX_NAME = os.getenv("ES_INDEX_NAME")
     # google
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     # url
     IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL")
+    # sentry
+    sentry_dsn = os.getenv("SENTRY_DSN")
+    DEBUG: bool = os.getenv("DEBUG") == "True"
 
 
 SECRET_KEY = "django-insecure-yuf$5dp72akchmepvw1&j^y_q1jw-hste)=1f^c#!gwt*(rvcc"
@@ -45,7 +74,27 @@ SECRET_KEY = "django-insecure-yuf$5dp72akchmepvw1&j^y_q1jw-hste)=1f^c#!gwt*(rvcc
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+# 图片存储路径
+IMAGE_SAVE_PATH = os.path.join(BASE_DIR, "images")
+if not os.path.exists(IMAGE_SAVE_PATH):
+    os.makedirs(IMAGE_SAVE_PATH)
+
+es = ESClient()
+# check es
+es.check_es()
+# init es index
+es.create_index()
+
+# sentry
+if not DEBUG:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        # Add data like request headers and IP for users,
+        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+        send_default_pii=True,
+    )
 
 # AUTH_USER_MODEL = "user.User"
 

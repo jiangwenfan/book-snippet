@@ -1,5 +1,26 @@
 services:
-  bs_backend:
+  bs-celery:
+    container_name: bs-celery
+    # TODO 使用backend镜像
+    image: bs-backend:latest
+    restart: unless-stopped
+    env_file: .env
+    # command: celery -A backend worker -P gevent -c 100 -l info
+    command: celery -A bs_backend worker --loglevel=INFO
+    depends_on:
+      bs-backend:
+        condition: service_started
+    volumes:
+      - bs-images:/bs_backend/images
+    networks:
+      - bs-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "3"
+
+  bs-backend:
     container_name: bs-backend
     build: . 
     image: bs-backend:latest
@@ -19,3 +40,7 @@ services:
 
 networks:
   bs-network:
+
+volumes:
+  bs-images:
+    name: bs-images

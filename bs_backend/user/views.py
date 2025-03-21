@@ -9,8 +9,9 @@ from rest_framework.exceptions import ValidationError
 from django.conf import settings
 from rest_framework.permissions import AllowAny
 import logging
-from user.utils import get_user_token
+from user.utils import get_user_token, save_image_to_local
 from rest_framework.response import Response
+from user.tasks import save_image_to_local_task
 
 
 class UserViewSet(ModelViewSet):
@@ -43,7 +44,13 @@ class UserViewSet(ModelViewSet):
         email = request_data.get("email")
         password = request_data.get("password")
 
+        url = "https://sample-videos.com/img/Sample-jpg-image-1mb.jpg"
+
         u, _ = User.objects.get_or_create(email=email, defaults={"password": password})
+
+        # avatar = save_image_to_local(url)
+        save_image_to_local_task.delay(u.pk, url)
+
         token_dict = get_user_token(u)
         return Response(token_dict)
 
@@ -78,13 +85,15 @@ class UserViewSet(ModelViewSet):
             email = google_info["email"]
             name = google_info.get("name", "")
             avatar_url = google_info.get("picture", "")
+            # 下载图片,返回新的图片文件名
+            avatar = save_image_to_local(avatar_url)
 
             # 保存用户信息
             user, _ = User.objects.update_or_create(
                 email=email,
                 defaults={
                     "username": name,
-                    "avatar": avatar_url,
+                    "avatar": avatar,
                 },
             )
 

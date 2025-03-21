@@ -5,6 +5,8 @@ from rest_framework.serializers import (
     CharField,
     ValidationError,
 )
+from snippet.models import ESDataModel
+from snippet.tasks import insert_data_to_es_task, update_data_to_es_task
 
 
 class SnippetSerializer(ModelSerializer):
@@ -44,7 +46,17 @@ class SnippetSerializer(ModelSerializer):
         # user
         validated_data["owner"] = self.user
         validated_data["created_user"] = self.user
-        return super().create(validated_data)
+        ins = super().create(validated_data)
+
+        # 保存到es
+        insert_data_to_es_task.delay(validated_data)
+        return ins
+
+    def update(self, instance, validated_data):
+        ins = super().update(instance, validated_data)
+        # 更新到es
+        update_data_to_es_task.delay(validated_data)
+        return ins
 
 
 class CategorySerializer(ModelSerializer):

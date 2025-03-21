@@ -6,9 +6,11 @@ from snippet.serializers import (
     SnippetLabelSerializer,
 )
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
+
+# from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import FilterSet, CharFilter
 import logging
+from snippet.tasks import delete_data_to_es_task
 
 
 class SnippetFilter(FilterSet):
@@ -45,6 +47,12 @@ class SnippetViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     # filterset_fields = ["category"]
     filterset_class = SnippetFilter
+
+    def perform_destroy(self, instance):
+        ins = super().perform_destroy(instance)
+        # 删除es
+        delete_data_to_es_task.delay(instance.id)
+        return ins
 
 
 class CategoryViewSet(ModelViewSet):

@@ -1,5 +1,6 @@
 from django.db import models
 from bs_backend.base_model import BaseModel
+from pydantic import BaseModel as PydanticBaseModel
 
 
 class Snippet(BaseModel):
@@ -75,3 +76,16 @@ class SnippetLabel(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class ESDataModel(PydanticBaseModel):
+    """ES数据模型"""
+
+    id: str
+    title: str
+    content: str
+    category: str
+    labels: list[str]
+    created_user: str
+    created_time: str
+    updated_time: str

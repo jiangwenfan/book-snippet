@@ -10,6 +10,12 @@
             "problemMatcher": []
         },
         {
+            "label": "c-log",
+            "type": "shell",
+            "command": "docker logs -f bs-celery",
+            "problemMatcher": []
+        },
+        {
             "label": "shell",
             "type": "shell",
             "command": "docker exec -it bs-backend /bin/bash",

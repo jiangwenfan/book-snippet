@@ -3,11 +3,12 @@
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ1MDUzMjExLCJpYXQiOjE3NDI0NjEyMTEsImp0aSI6ImRmNzY2NjVmZGY3ZDQ1ZmRiMzE0ZGQ0OWU3NDA0NzMwIiwidXNlcl9pZCI6MSwidXNlcl9uYW1lIjoiIn0.zNqgXmWOADckWKbaNmR-9mKw68YENawZNpHP0RT9i1M
 ### 
 # test login
-POST http://localhost:8080/users/login/
+POST http://localhost:80/bs/api/users/login/
+# POST http://localhost:8080/users/login/
 Content-Type: application/json
 
 {
-    "email":"123@qq.com",
+    "email":"1234@qq.com",
     "password":"123"
 }
 
