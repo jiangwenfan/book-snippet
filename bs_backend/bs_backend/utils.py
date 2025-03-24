@@ -77,15 +77,23 @@ class ESClient:
             logging.error(f"删除数据:{data_id} 失败: {response}")
         logging.info(f"删除数据:{data_id} 成功: {response}")
 
-    def search_data(self, key: str) -> list[dict]:
-        """搜索数据
+    def search_text_data(self, user_id: int, text_key: str) -> list[dict]:
+        """搜索该用户下的 text字段的数据
         query: {
             "query": {
                 "match_all": {}
             }
         }
         """
-        query = {"query": {"match": {"title": "指南"}}}
+        query = {
+            "query": {
+                # 使用 "bool" 复合查询，允许组合多个查询条件
+                "bool": {
+                    "must": [{"match": {"text": text_key}}],
+                    "filter": [{"term": {"user_id": user_id}}],
+                }
+            }
+        }
 
         response = self.es.search(index=self.index_name, body=query)
 

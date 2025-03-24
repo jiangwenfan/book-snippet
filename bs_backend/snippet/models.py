@@ -16,6 +16,7 @@ class Snippet(BaseModel):
         blank=True,
     )
 
+    # 属于哪个用户
     owner = models.ForeignKey(
         "user.User",
         on_delete=models.SET_NULL,
@@ -49,6 +50,8 @@ class Category(BaseModel):
         "user.User",
         related_name="categories",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -68,6 +71,8 @@ class SnippetLabel(BaseModel):
         "user.User",
         related_name="labels",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -81,11 +86,8 @@ class SnippetLabel(BaseModel):
 class ESDataModel(PydanticBaseModel):
     """ES数据模型"""
 
-    id: str
-    title: str
-    content: str
+    id: int
+    text: str
     category: str
     labels: list[str]
-    created_user: str
-    created_time: str
-    updated_time: str
+    owner_id: int

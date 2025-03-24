@@ -7,10 +7,10 @@ from snippet.views import SnippetViewSet, CategoryViewSet, SnippetLabelViewSet
 
 router = routers.DefaultRouter()
 
-router.register(r"users", UserViewSet)
-router.register(r"snippets", SnippetViewSet)
-router.register(r"categories", CategoryViewSet)
-router.register(r"labels", SnippetLabelViewSet)
+router.register(r"users", UserViewSet, basename="user")
+router.register(r"snippets", SnippetViewSet, basename="snippet")
+router.register(r"categories", CategoryViewSet, basename="category")
+router.register(r"labels", SnippetLabelViewSet, basename="label")
 
 
 urlpatterns = [

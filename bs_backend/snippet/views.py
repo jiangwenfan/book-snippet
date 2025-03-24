@@ -11,29 +11,41 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_filters.rest_framework import FilterSet, CharFilter
 import logging
 from snippet.tasks import delete_data_to_es_task
+from bs_backend.utils import ESClient
 
 
 class SnippetFilter(FilterSet):
     category = CharFilter(field_name="category__id", lookup_expr="icontains")
+    labels = CharFilter(field_name="labels", method="filter_by_labels")
+    search = CharFilter(field_name="text", method="filter_by_search")
 
-    labels = CharFilter(field_name="labels", method="filter_by_dtags")
-
-    def filter_by_dtags(self, queryset, name, value):
+    def filter_by_labels(self, queryset, name, value):
+        """根据labels过滤,多个labels是and的关系"""
         before_count = queryset.count()
 
         labels_list = value.split(",")
         labels_queryset = SnippetLabel.objects.filter(name__in=labels_list)
-        # if ditags_queryset.count() != len(labels_list):
-        #     logging.info(
-        #         f"根据dtags查询数据集时，部分tag不存在，输入dtags数量：{len(labels_list)}，存在tag数量：{ditags_queryset.count()},将以实际找到的tag为准"
-        #     )
+
         for label in labels_queryset:
             queryset = queryset.filter(labels=label)
 
+        labels = list(labels_queryset.values_list("name", flat=True))
         logging.info(
-            f"实际过滤的dtags: {labels_queryset.values_list('name', flat=True)},过滤前数量:{before_count},过滤后数量：{queryset.count()}"
+            f"过滤前数量:{before_count},过滤后数量：{queryset.count()}, 实际参与过滤:{labels}"
         )
 
+        return queryset
+
+    def filter_by_search(self, queryset, name, value):
+        """全文本搜索"""
+        user_id = self.request.user.id
+        es = ESClient()
+
+        logging.info(f"搜索 user_id:{user_id}, text_key:{value}")
+        res = es.search_text_data(user_id=user_id, text_key=value)
+        # print("res", res)
+        ids = [item["id"] for item in res]
+        queryset = queryset.filter(id__in=ids)
         return queryset
 
     class Meta:
@@ -42,11 +54,12 @@ class SnippetFilter(FilterSet):
 
 
 class SnippetViewSet(ModelViewSet):
-    queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ["category"]
     filterset_class = SnippetFilter
+
+    def get_queryset(self):
+        return Snippet.objects.filter(owner=self.request.user)
 
     def perform_destroy(self, instance):
         ins = super().perform_destroy(instance)
@@ -56,10 +69,14 @@ class SnippetViewSet(ModelViewSet):
 
 
 class CategoryViewSet(ModelViewSet):
-    queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        return Category.objects.filter(owner=self.request.user)
 
 
 class SnippetLabelViewSet(ModelViewSet):
-    queryset = SnippetLabel.objects.all()
     serializer_class = SnippetLabelSerializer
+
+    def get_queryset(self):
+        return SnippetLabel.objects.filter(owner=self.request.user)
