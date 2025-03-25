@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'api_data.dart';
 
 // 全局基础页面
 class BasePage extends HookWidget {
@@ -25,12 +26,15 @@ class BasePage extends HookWidget {
 
 // 搜索widget
 class SearchWidget extends HookWidget {
-  const SearchWidget({super.key});
+  final bool readOnly;
+  const SearchWidget({super.key, this.readOnly = false});
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(10),
+
       child: TextField(
+        readOnly: readOnly,
         decoration: InputDecoration(
           hintText: "搜索书摘",
           prefixIcon: Icon(Icons.search),
@@ -174,4 +178,29 @@ class TokenOp {
   static Future<String?> readToken() async {
     return await storage.read(key: "token");
   }
+}
+
+// TODO SharedPreference 封装
+
+// 获取用户最新数据
+void getUserLastData() async {
+  // 2.1 获取该用户所有分类
+  final res1 = await ApiData.getCategory();
+  // TODO 写入全局变量,暂时写到shared_preferences中
+
+  // 2.2 获取该用户所有标签
+  final res2 = ApiData.getLabel();
+
+  // 2.3 获取该用户第一页的全部书摘
+  final res3 = ApiData.getAllContent();
+}
+
+// 登陆成之后初始化
+void loginInit(context, String token) async {
+  // 将token存储起来
+  await TokenOp.writeToken(token);
+  // 2. 发送请求，获取用户数据
+  getUserLastData();
+  // 1. 跳转到首页
+  context.go("/content");
 }

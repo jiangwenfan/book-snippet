@@ -15,8 +15,10 @@ migrate_working_dir/
 # ---- backend ---- 
 __pycache__
 *.pyc
+bs_backend/images/
 
 # ---- mobile ----
+bs_mobile/build/ios/*
 
 # IntelliJ related
 *.iml

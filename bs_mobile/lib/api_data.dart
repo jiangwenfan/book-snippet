@@ -32,6 +32,7 @@ class ApiData {
         headers: {"Authorization": "Bearer ${await TokenOp.readToken()}"},
       ),
     );
+    print("获取分类数据...${response.data}");
     return response.data;
   }
 
@@ -50,18 +51,19 @@ class ApiData {
   // ------------获取用户的标签数据----------
   static Future<dynamic> getLabel() async {
     final Response response = await dio.get(
-      "/tags/",
+      "/labels/",
       options: Options(
         headers: {"Authorization": "Bearer ${await TokenOp.readToken()}"},
       ),
     );
+    print("获取标签数据...${response.data}");
     return response.data;
   }
 
   // ------------获取用户的内容数据-----------
   static Future<dynamic> _getContentBase(Map<String, dynamic> query) async {
     final Response response = await dio.get(
-      "/contents/",
+      "/snippets/",
       queryParameters: query,
       options: Options(
         headers: {"Authorization": "Bearer ${await TokenOp.readToken()}"},
@@ -72,22 +74,30 @@ class ApiData {
 
   // 获取全部内容
   static Future<dynamic> getAllContent() async {
-    return await _getContentBase({});
+    final res = await _getContentBase({});
+    print("获取全部内容...${res}");
+    return res;
   }
 
   // 根据category_id获取内容
   static Future<dynamic> getContentByCategoryId(String categoryId) async {
-    return await _getContentBase({"category_id": categoryId});
+    final res = await _getContentBase({"category_id": categoryId});
+    print("根据category_id获取内容...${res}");
+    return res;
   }
 
   // 根据labels获取内容
   static Future<dynamic> getContentByLabels(List<String> labels) async {
-    return await _getContentBase({"labels": labels.join(",")});
+    final res = await _getContentBase({"labels": labels.join(",")});
+    print("根据labels获取内容...${res}");
+    return res;
   }
 
   // 使用search搜索内容
   static Future<dynamic> searchContent(String search) async {
-    return await _getContentBase({"search": search});
+    final res = await _getContentBase({"search": search});
+    print("使用search搜索内容...${res}");
+    return res;
   }
 
   // 创建用户的内容数据

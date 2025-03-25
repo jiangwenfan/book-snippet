@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:bs_mobile/utils.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:bs_mobile/api_data.dart';
@@ -48,8 +49,7 @@ class LoginIndexPage extends HookWidget {
                   final responseData = response as Map<String, dynamic>;
                   print("google登陆成功...${responseData}");
 
-                  // 将token存储起来
-                  await TokenOp.writeToken(responseData["token"]);
+                  loginInit(context, responseData["token"]);
                 } catch (e) {
                   print("google登陆错误...${e}");
                 }
@@ -122,29 +122,34 @@ class LoginIndexPage extends HookWidget {
 
 class ReadmeWidget extends HookWidget {
   const ReadmeWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final isChecked = useState(false);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Radio(
-          value: "ok",
-          groupValue: "1",
+        Checkbox(
+          value: isChecked.value,
           onChanged: (value) {
-            print("ok");
+            isChecked.value = value!;
           },
+          visualDensity: VisualDensity.compact, // 减少内边距
         ),
         Text("我已阅读并同意"),
         TextButton(
           onPressed: () {
             print("查看服务协议");
           },
+          style: TextButton.styleFrom(padding: EdgeInsets.zero),
           child: Text("<服务协议>"),
         ),
         TextButton(
           onPressed: () {
             print("查看隐私政策");
           },
+          style: TextButton.styleFrom(padding: EdgeInsets.zero),
           child: Text("<隐私政策>"),
         ),
       ],

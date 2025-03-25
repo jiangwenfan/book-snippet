@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:bs_mobile/utils.dart';
+import 'package:go_router/go_router.dart';
 import 'package:bs_mobile/api_data.dart';
 
 class CategoryPage extends HookWidget {
@@ -57,11 +58,36 @@ class CategoryPage extends HookWidget {
               // ),
 
               // 根据书分类: 显示3行，左右滑动。
-              Book(bookTiile: "《活着》", bookIcon: Icons.book, bookCount: 10),
-              Book(bookTiile: "《白夜行》", bookIcon: Icons.book, bookCount: 20),
-              Book(bookTiile: "《追风筝的人》", bookIcon: Icons.book, bookCount: 30),
-              Book(bookTiile: "《解忧杂货店》", bookIcon: Icons.book, bookCount: 40),
-              Book(bookTiile: "《小王子》", bookIcon: Icons.book, bookCount: 50),
+              Book(
+                categoryId: 1,
+                bookTiile: "《活着》",
+                bookIcon: Icons.book,
+                bookCount: 10,
+              ),
+              Book(
+                categoryId: 1,
+                bookTiile: "《白夜行》",
+                bookIcon: Icons.book,
+                bookCount: 20,
+              ),
+              Book(
+                categoryId: 1,
+                bookTiile: "《追风筝的人》",
+                bookIcon: Icons.book,
+                bookCount: 30,
+              ),
+              Book(
+                categoryId: 1,
+                bookTiile: "《解忧杂货店》",
+                bookIcon: Icons.book,
+                bookCount: 40,
+              ),
+              Book(
+                categoryId: 1,
+                bookTiile: "《小王子》",
+                bookIcon: Icons.book,
+                bookCount: 50,
+              ),
 
               // allCategory.value.isEmpty
               //     ? CircularProgressIndicator()
@@ -104,47 +130,58 @@ class AllTitleWidget extends HookWidget {
 }
 
 // ---- utils----
+
 class Book extends HookWidget {
+  final int categoryId;
   final String bookTiile;
   final IconData bookIcon;
   final int bookCount;
   const Book({
     super.key,
+    required this.categoryId,
     required this.bookTiile,
     required this.bookIcon,
     required this.bookCount,
   });
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // width: 30,
-      // height: 20,
-      // color: Colors.green,
-      margin: EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.green,
-      ),
-      child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(bookIcon, size: 30),
-              Text(bookTiile, style: TextStyle(fontSize: 15)),
-            ],
-          ),
-          Container(
-            child: TextButton(
-              onPressed: () {
-                print("查看该书的所有书摘");
-              },
-              child: Text("$bookCount >"),
+    return GestureDetector(
+      onTap: () {
+        print("跳转到该分类下的书摘列表");
+        GoRouter.of(context).go("/content");
+      },
+      child: Container(
+        // width: 30,
+        // height: 20,
+        // color: Colors.green,
+        margin: EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.green,
+        ),
+        child: Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(bookIcon, size: 30),
+                Text(bookTiile, style: TextStyle(fontSize: 15)),
+              ],
             ),
-            // margin: EdgeInsets.only(bottom: 45),
-          ),
-        ],
+            Text("$bookCount >"),
+            // Container(
+            //   child: TextButton(
+            //     onPressed: () {
+            //       print("查看该书的所有书摘");
+            //     },
+            //     child: Text("$bookCount >"),
+            //   ),
+
+            //   // margin: EdgeInsets.only(bottom: 45),
+            // ),
+          ],
+        ),
       ),
     );
   }

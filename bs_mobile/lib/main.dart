@@ -5,6 +5,7 @@ import 'package:bs_mobile/login/index_page.dart';
 import 'package:bs_mobile/home/category_page.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/api_data.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,12 @@ void main() async {
 
   // init 1. 获取token
   final String? token = await TokenOp.readToken();
+
+  // 2. 如果token不为空，用户已经登陆，则获取用户数据
+  if (token != null) {
+    getUserLastData();
+  }
+
   print("启动: token: $token");
 
   // 移除启动页
