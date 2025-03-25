@@ -1,4 +1,5 @@
 import 'package:bs_mobile/home/content_page.dart';
+import 'package:bs_mobile/router.dart';
 import 'package:flutter/material.dart';
 import 'package:bs_mobile/login/index_page.dart';
 import 'package:bs_mobile/home/category_page.dart';
@@ -24,12 +25,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routerConfig: router,
     );
   }
 }
