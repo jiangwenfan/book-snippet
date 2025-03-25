@@ -18,7 +18,7 @@ __pycache__
 bs_backend/images/
 
 # ---- mobile ----
-bs_mobile/build/ios/*
+bs_mobile/build/*
 
 # IntelliJ related
 *.iml
