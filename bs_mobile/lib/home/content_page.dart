@@ -5,34 +5,56 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 class ContentPage extends HookWidget {
   const ContentPage({super.key});
+
+  Future<void> getLocalData(
+    ValueNotifier<bool> isLoading,
+    ValueNotifier<List<dynamic>> content,
+  ) async {
+    final res = await SharedPreferenceOp.readPartContent();
+
+    // 更新到当前状态
+    isLoading.value = false;
+    if (res != null) {
+      content.value = res["results"];
+    }
+    print("从 local 读取[部分content]数据: $res");
+  }
+
+  Future<void> getRemoteData(
+    ValueNotifier<bool> isLoading,
+    ValueNotifier<List<dynamic>> content,
+  ) async {
+    await getUserLastData();
+    print("从 remote 读取[所有数据]保存到local");
+
+    await getLocalData(isLoading, content);
+  }
+
   @override
   Widget build(BuildContext context) {
-    BasePage(
-      title: TitleWidget(title: "书摘"),
-      widget: ListView(
-        children: [
-          Item(
-            text: "随着飞船缓缓驶入未知星系，浩瀚宇宙的真实面貌逐渐展现在他们眼前。星星不再是遥远而冰冷的光点，而是变成了指引前行的灯塔。",
-          ),
-          Item(text: "在这个世界上，有一种爱情，是不需要言语的。它是一种默契，一种默契的默契，一种默契的默契的默契。"),
-          Item(text: "在这个世界上，有一种爱情，是不需要言语的。"),
-          //
-          // BottomInfo(count: 154),
-          AddItem(),
-        ],
-      ),
-    );
-    // TODO 从全局读取数据
+    // BottomInfo(count: 154),
+    // AddItem(),
+
+    final isLoading = useState(false);
+    final contentData = useState([]);
+
+    useEffect(() {
+      // 当页面加载时，
+      // 1.1 从本地/全局读取数据，显示
+      getLocalData(isLoading, contentData);
+
+      // 1.2 获取最新数据
+      getRemoteData(isLoading, contentData);
+    }, []);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("密码"),
+        title: Text("书摘"),
         centerTitle: false,
-        // leading: BackButton(),
         leading: IconButton(
           onPressed: () {
+            // 进入分类页面
             GoRouter.of(context).go("/category");
-            // context.go("/category");
           },
           icon: Icon(Icons.arrow_back),
         ),
@@ -40,13 +62,14 @@ class ContentPage extends HookWidget {
           IconButton(
             icon: Icon(Icons.people),
             onPressed: () {
-              print("用户中心");
+              // 进入用户页面
+              GoRouter.of(context).go("/user");
             },
           ),
           IconButton(
             icon: Icon(Icons.check_circle_outline),
             onPressed: () {
-              print("全选");
+              print("点击-全选");
             },
           ),
         ],
@@ -59,15 +82,13 @@ class ContentPage extends HookWidget {
             style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
 
-          // TODO 2.当没有数据时，禁用掉输入框
-          //    Padding(
-          //   padding: EdgeInsets.all(16),
-          //   child:
-          // ),
-          SearchWidget(),
+          // 当正在加载时，禁止输入框
+          isLoading.value ? SearchWidget(readOnly: true) : SearchWidget(),
 
-          // 3. 显示内容
-          ContentWidget(),
+          // 3. 正在加载时，显示加载中
+          isLoading.value
+              ? CircularProgressIndicator()
+              : ContentWidget(contentData: contentData),
         ],
       ),
     );
@@ -75,21 +96,18 @@ class ContentPage extends HookWidget {
 }
 
 class ContentWidget extends HookWidget {
-  const ContentWidget({super.key});
+  final ValueNotifier<List<dynamic>> contentData;
+  const ContentWidget({super.key, required this.contentData});
+
   @override
   Widget build(BuildContext context) {
-    return
-    // TODO 如果没有数据 就显示加载中
-    // CircularProgressIndicator(),
-    Expanded(
+    final content = contentData.value;
+
+    return Expanded(
       child: ListView.builder(
-        // TODO 显示内容
-        itemCount: 10,
+        itemCount: content.length,
         itemBuilder: (context, index) {
-          return Item(
-            text:
-                "item $index 在这动荡不安的年代，他以非凡的勇气和智慧，带领人民走过了一段艰难而又辉煌的历程。每一个决策背后，都是无数个不眠之夜的深思熟虑；每一步前进，都凝聚着对国家和民族未来的深切期盼",
-          );
+          return Item(text: content[index]["text"]);
         },
       ),
     );

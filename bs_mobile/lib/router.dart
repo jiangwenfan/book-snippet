@@ -2,6 +2,7 @@ import 'package:bs_mobile/home/content_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bs_mobile/login/index_page.dart';
 import 'package:bs_mobile/home/category_page.dart';
+import 'package:bs_mobile/user/user_page.dart';
 import 'package:bs_mobile/utils.dart';
 
 final GoRouter router = GoRouter(
@@ -14,10 +15,12 @@ final GoRouter router = GoRouter(
     GoRoute(path: "/content", builder: (context, state) => ContentPage()),
     // 分类页
     GoRoute(path: "/category", builder: (context, state) => CategoryPage()),
+    // 用户页
+    GoRoute(path: "/user", builder: (context, state) => UserPage()),
   ],
 
   redirect: (context, state) async {
-    // TODO 从riverpod中获取登陆状态
+    // 从 riverpod 中获取登陆状态
     final token = await TokenOp.readToken();
     final bool isLogin = token != null;
 
