@@ -20,6 +20,9 @@ bs_backend/images/
 # ---- mobile ----
 bs_mobile/build/*
 
+# ---- web ----
+bs_web/node_modules/*
+
 # IntelliJ related
 *.iml
 *.ipr
