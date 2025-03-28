@@ -12,8 +12,7 @@ class WeChatSign extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return LoginButton(
-      // TODO 修改icon
-      loginIcon: Icon(Icons.circle),
+      loginIcon: Icon(Icons.wechat),
       loginText: "通过 微信 登陆",
       loginFunction: () {
         print("通过 微信 登陆");

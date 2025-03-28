@@ -267,11 +267,23 @@ class SharedPreferenceOp {
   }
 
   // 根据分类写入书摘数据
-  static Future<void> writeContentByCategory(
-    String category,
-    Map<String, dynamic> data,
-  ) async {
-    final key = "contentByCategory_$category";
+  static Future<void> writeContentByCategory({
+    required String categoryId,
+    required Map<String, dynamic> data,
+  }) async {
+    final key = "contentByCategory_$categoryId";
+    final value = json.encode(data);
+    await _writeData(key, value);
+  }
+
+  // 根据标签写入书摘数据
+  static Future<void> writeContentByLabels({
+    required String labels,
+    required Map<String, dynamic> data,
+  }) async {
+    // final labelsString = labels.join(",");
+
+    final key = "contentByLabels_$labels";
     final value = json.encode(data);
     await _writeData(key, value);
   }
@@ -305,10 +317,20 @@ class SharedPreferenceOp {
   }
 
   // 根据分类读取书摘数据
-  static Future<Map<String, dynamic>?> readContentByCategory(
-    String category,
-  ) async {
-    final key = "contentByCategory_$category";
+  static Future<Map<String, dynamic>?> readContentByCategory({
+    required String categoryId,
+  }) async {
+    final key = "contentByCategory_$categoryId";
+    final value = await _readData(key);
+    return value == null ? null : json.decode(value);
+  }
+
+  // 根据标签读取书摘数据
+  static Future<Map<String, dynamic>?> readContentByLabels({
+    required String labels,
+  }) async {
+    // final labelsString = labels.join(",");
+    final key = "contentByLabels_$labels";
     final value = await _readData(key);
     return value == null ? null : json.decode(value);
   }
@@ -330,10 +352,43 @@ Future<void> getUserLastData() async {
   await SharedPreferenceOp.writePartContent(res3);
 }
 
+// 获取用户最新的根据category过滤的书摘数据
+Future<void> getUserLastDataByCategory(String categoryId) async {
+  // 2.2 获取该用户第一页的根据category过滤的书摘数据
+  final res3 = await ApiData.getContentByCategoryId(categoryId);
+  // 写入到本地
+  await SharedPreferenceOp.writeContentByCategory(
+    categoryId: categoryId,
+    data: res3,
+  );
+}
+
+// 获取用户最新的根据labels过滤的书摘数据
+Future<void> getUserLastDataByLabels(String labels) async {
+  // 2.2 获取该用户第一页的根据labels过滤的书摘数据
+  final res3 = await ApiData.getContentByLabels(labels);
+  // 写入到本地
+  await SharedPreferenceOp.writeContentByLabels(labels: labels, data: res3);
+}
+
 // 登陆成之后初始化
 void loginInit(String token) async {
   // 将token存储起来
   await TokenOp.writeToken(token);
   // 2. 发送请求，获取用户数据
   getUserLastData();
+}
+
+// icons
+class IconsFont {
+  static const String _family = 'IconFont';
+
+  static const IconData wechat = IconData(0xe6ba, fontFamily: _family);
+  static const IconData wechatFill = IconData(0xe883, fontFamily: _family);
+
+  static const IconData phone = IconData(0xe634, fontFamily: _family);
+  static const IconData phoneFill = IconData(0xe7ca, fontFamily: _family);
+
+  static const IconData google = IconData(0xe602, fontFamily: _family);
+  static const IconData googleLogo = IconData(0xe795, fontFamily: _family);
 }

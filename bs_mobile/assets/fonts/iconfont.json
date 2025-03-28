@@ -1,0 +1,68 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "4114437",
+      "name": "wechat",
+      "font_class": "wechat",
+      "unicode": "e6ba",
+      "unicode_decimal": 59066
+    },
+    {
+      "icon_id": "4936991",
+      "name": "wechat-fill",
+      "font_class": "wechat-fill",
+      "unicode": "e883",
+      "unicode_decimal": 59523
+    },
+
+    {
+      "icon_id": "7821164",
+      "name": "phone",
+      "font_class": "phone",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
+      "icon_id": "6151138",
+      "name": "phone-fill",
+      "font_class": "phone-fill",
+      "unicode": "e7ca",
+      "unicode_decimal": 59338
+    },
+
+    {
+      "icon_id": "22904716",
+      "name": "google",
+      "font_class": "google",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "7656251",
+      "name": "logo-google",
+      "font_class": "logo-google",
+      "unicode": "e795",
+      "unicode_decimal": 59285
+    },
+
+    {
+      "icon_id": "4936967",
+      "name": "apple",
+      "font_class": "apple",
+      "unicode": "e87e",
+      "unicode_decimal": 59518
+    },
+    {
+      "icon_id": "4936981",
+      "name": "apple-fill",
+      "font_class": "apple-fill",
+      "unicode": "e881",
+      "unicode_decimal": 59521
+    }
+  ]
+}

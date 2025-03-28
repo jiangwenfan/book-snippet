@@ -6,12 +6,68 @@ import './content_widgets.dart';
 
 // AddItem(),
 class ContentPage extends HookWidget {
-  const ContentPage({super.key});
+  final Map<String, String> queryPara;
+  const ContentPage({super.key, required this.queryPara});
+
+  Future<void> refreshContentByCategory(
+    String category,
+    ValueNotifier<List<dynamic>> content,
+  ) async {
+    final resByCategory = await SharedPreferenceOp.readContentByCategory(
+      categoryId: category,
+    );
+    if (resByCategory != null) {
+      content.value = resByCategory["results"];
+    }
+    print("snippet-category过滤-从local读取数据成功: ${resByCategory?.length}");
+  }
+
+  Future<void> refreshContentByLabels(
+    String labels,
+    ValueNotifier<List<dynamic>> content,
+  ) async {
+    final resByLabels = await SharedPreferenceOp.readContentByLabels(
+      labels: labels,
+    );
+    if (resByLabels != null) {
+      content.value = resByLabels["results"];
+    }
+    print("snippet-labels过滤-从local读取数据成功: ${resByLabels?.length}");
+  }
 
   Future<void> getLocalData(
     ValueNotifier<bool> isLoading,
     ValueNotifier<List<dynamic>> content,
   ) async {
+    if (queryPara.containsKey("category") && queryPara["category"] != null) {
+      // 存在分类参数
+      final category = queryPara["category"]!;
+
+      // 从本地读取数据
+      await refreshContentByCategory(category, content);
+
+      // 从远程读取最新数据
+      await getUserLastDataByCategory(category);
+      await refreshContentByCategory(category, content);
+      print("snippet-category过滤-从remote读取数据成功");
+
+      return;
+    }
+    if (queryPara.containsKey("labels") && queryPara["labels"] != null) {
+      // 存在标签参数
+      final labels = queryPara["labels"]!;
+
+      // 从本地读取数据
+      await refreshContentByLabels(labels, content);
+
+      // 从remote读取最新数据
+      await getUserLastDataByLabels(labels);
+      await refreshContentByLabels(labels, content);
+      print("snippet-labels过滤-从remote读取数据成功");
+
+      return;
+    }
+
     final res = await SharedPreferenceOp.readPartContent();
     if (res != null) {
       content.value = res["results"];

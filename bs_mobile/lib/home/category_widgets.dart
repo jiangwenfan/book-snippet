@@ -39,10 +39,9 @@ class ShowAllLabelsWidget extends HookWidget {
             labels.value.map((label) {
               return TextButton(
                 onPressed: () {
-                  //  TODO 点击labels进行跳转，跳转到该标签下的书摘列表
-                  print("category-跳转到 $label 标签下的书摘列表");
-
-                  // GoRouter.of(context).go("/content");
+                  String path = "/snippet?labels=$label";
+                  GoRouter.of(context).go(path);
+                  print("category-跳转到 $path 标签下的书摘列表");
                 },
                 child: Text(label),
               );
@@ -70,8 +69,9 @@ class Book extends HookWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("跳转到该分类下的书摘列表");
-        GoRouter.of(context).go("/content");
+        String path = "/snippet?categoryId=$categoryId";
+        GoRouter.of(context).go(path);
+        print("category-跳转到 $path 分类下的书摘列表");
       },
       child: Container(
         // width: 30,

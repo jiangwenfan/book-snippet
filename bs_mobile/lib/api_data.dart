@@ -87,8 +87,8 @@ class ApiData {
   }
 
   // 根据labels获取内容
-  static Future<dynamic> getContentByLabels(List<String> labels) async {
-    final res = await _getContentBase({"labels": labels.join(",")});
+  static Future<dynamic> getContentByLabels(String labels) async {
+    final res = await _getContentBase({"labels": labels});
     print("根据labels获取内容...${res}");
     return res;
   }

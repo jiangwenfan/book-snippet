@@ -13,7 +13,14 @@ final GoRouter router = GoRouter(
     GoRoute(path: "/loginIndex", builder: (context, state) => LoginIndexPage()),
 
     // 内容页,默认进入
-    GoRoute(path: "/snippet", builder: (context, state) => ContentPage()),
+    GoRoute(
+      path: "/snippet",
+      builder: (context, state) {
+        final queryPara = state.uri.queryParameters;
+        print("snippet-query参数: ${queryPara}");
+        return ContentPage(queryPara: queryPara);
+      },
+    ),
     // 分类页
     GoRoute(path: "/category", builder: (context, state) => CategoryPage()),
 
