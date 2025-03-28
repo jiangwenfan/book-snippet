@@ -14,13 +14,12 @@ void main() async {
 
   // init 1. 获取token
   final String? token = await TokenOp.readToken();
+  print("启动: token: $token");
 
   // 2. 如果token不为空，用户已经登陆，则获取用户数据
   if (token != null) {
     getUserLastData();
   }
-
-  print("启动: token: $token");
 
   // 移除启动页
   FlutterNativeSplash.remove();

@@ -2,7 +2,9 @@ import 'package:bs_mobile/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import './content_widgets.dart';
 
+// AddItem(),
 class ContentPage extends HookWidget {
   const ContentPage({super.key});
 
@@ -32,9 +34,6 @@ class ContentPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // BottomInfo(count: 154),
-    // AddItem(),
-
     final isLoading = useState(false);
     final contentData = useState([]);
 
@@ -59,13 +58,10 @@ class ContentPage extends HookWidget {
           icon: Icon(Icons.arrow_back),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.people),
-            onPressed: () {
-              // 进入用户页面
-              GoRouter.of(context).go("/user");
-            },
-          ),
+          // 1. 用户中心按钮
+          UserCenterButton(),
+
+          // 2. 全选按钮
           IconButton(
             icon: Icon(Icons.check_circle_outline),
             onPressed: () {
@@ -74,21 +70,30 @@ class ContentPage extends HookWidget {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      body: Stack(
         children: [
-          Text(
-            "全部",
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          // 1. 标题
+          ContentTitle(title: "全部"),
+
+          // 2. 搜索框
+          SearchWidget(isLoading: isLoading),
+
+          // 3. 内容列表
+          Expanded(
+            child: ContentWidget(
+              isLoading: isLoading,
+              contentData: contentData,
+            ),
           ),
 
-          // 当正在加载时，禁止输入框
-          isLoading.value ? SearchWidget(readOnly: true) : SearchWidget(),
-
-          // 3. 正在加载时，显示加载中
-          isLoading.value
-              ? CircularProgressIndicator()
-              : ContentWidget(contentData: contentData),
+          // 显示底部控制栏
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: BottomInfo(count: 154),
+            // Container(width: 100, height: 100, color: Colors.green),
+          ),
         ],
       ),
     );
@@ -97,43 +102,24 @@ class ContentPage extends HookWidget {
 
 class ContentWidget extends HookWidget {
   final ValueNotifier<List<dynamic>> contentData;
-  const ContentWidget({super.key, required this.contentData});
+  final ValueNotifier<bool> isLoading;
+  const ContentWidget({
+    super.key,
+    required this.isLoading,
+    required this.contentData,
+  });
 
   @override
   Widget build(BuildContext context) {
     final content = contentData.value;
 
-    return Expanded(
-      child: ListView.builder(
-        itemCount: content.length,
-        itemBuilder: (context, index) {
-          return Item(text: content[index]["text"]);
-        },
-      ),
-    );
-  }
-}
-
-//  --- utils ---
-class Item extends HookWidget {
-  final String text;
-  const Item({super.key, required this.text});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.all(10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 20),
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
-      ),
-    );
+    return isLoading.value
+        ? CircularProgressIndicator()
+        : ListView.builder(
+          itemCount: content.length,
+          itemBuilder: (context, index) {
+            return Item(text: content[index]["text"]);
+          },
+        );
   }
 }

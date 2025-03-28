@@ -28,15 +28,16 @@ class BasePage extends HookWidget {
 
 // 搜索widget
 class SearchWidget extends HookWidget {
-  final bool readOnly;
-  const SearchWidget({super.key, this.readOnly = false});
+  final ValueNotifier<bool> isLoading;
+  const SearchWidget({super.key, required this.isLoading});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(10),
 
       child: TextField(
-        readOnly: readOnly,
+        readOnly: isLoading.value ? true : false,
         decoration: InputDecoration(
           hintText: "搜索书摘",
           prefixIcon: Icon(Icons.search),
@@ -88,7 +89,10 @@ class BottomInfoBase extends HookWidget {
           if (widget2 != null) widget2!,
           IconButton(
             onPressed: () {
-              print("添加");
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => AddItem(),
+              );
             },
             icon: Icon(Icons.add, size: 45),
           ),
@@ -167,6 +171,47 @@ class AddItem extends HookWidget {
       ),
     );
   }
+}
+
+// 全局提示dialog
+class SimpleDialogWidget extends HookWidget {
+  final String title;
+  final String content;
+  const SimpleDialogWidget({
+    super.key,
+    required this.title,
+    required this.content,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("知道了"),
+        ),
+      ],
+    );
+  }
+}
+
+// 显示全局提示dialog
+void showSimpleDialogWidget({
+  required BuildContext context,
+  required String title,
+  required String content,
+}) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return SimpleDialogWidget(title: title, content: content);
+    },
+  );
 }
 
 // 将token存储起来
