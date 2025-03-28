@@ -18,16 +18,17 @@ class CategoryPage extends HookWidget {
     final resLabel = await SharedPreferenceOp.readAllLabel();
 
     // 更新到当前状态
-    isLoading.value = false;
     if (res != null) {
       allCategory.value = res["results"];
     }
+    print("category-从local读取数据成功: ${res?.length}");
+
     if (resLabel != null) {
       allLabels.value = resLabel["results"];
     }
+    print("category-从local读取数据成功: ${resLabel?.length}");
 
     isLoading.value = false;
-    print("从 local 显示数据成功");
   }
 
   Future<void> getRemoteData(
@@ -35,26 +36,11 @@ class CategoryPage extends HookWidget {
     ValueNotifier<List<dynamic>> allCategory,
     ValueNotifier<List<String>> allLabels,
   ) async {
-    // 1. 获取category
-    try {
-      final res = await ApiData.getCategory();
-      // 写入到本地
-      await SharedPreferenceOp.writeAllCategory(res);
-    } catch (e) {
-      print("获取分类失败...$e");
-    }
+    print("category-从remote读取-写入数据到本地-start-....");
+    await getUserLastData();
+    print("category-从remote读取-写入数据到本地-end-成功");
 
-    // 2. 获取标签
-    try {
-      final res = await ApiData.getLabel();
-      // 写入到本地
-      await SharedPreferenceOp.writeAllLabel(res);
-    } catch (e) {
-      print("获取标签失败...$e");
-    }
-    print("从 remote 获取数据成功");
-
-    // 3. 刷新到页面
+    // 刷新到页面
     await getLocalData(isLoading, allCategory, allLabels);
   }
 
@@ -88,6 +74,16 @@ List<Widget> showMainWidget(
   ValueNotifier<List<dynamic>> allCategory,
   ValueNotifier<List<String>> allLabels,
 ) {
+  // test 输出
+  final testC = allCategory.value;
+  if (testC.isNotEmpty) {
+    print("category-category item结构: ${testC[0].toString()}");
+  }
+  final testL = allLabels.value;
+  if (testL.isNotEmpty) {
+    print("categoty-labels item结构: ${testL[0].toString()}");
+  }
+
   return !isLoading.value
       ? [CircularProgressIndicator()]
       : [
@@ -97,14 +93,13 @@ List<Widget> showMainWidget(
           mainAxisSpacing: 10,
           childAspectRatio: 20 / 10,
           padding: EdgeInsets.all(10),
-
           children:
               allCategory.value.map<Widget>((item) {
                 return Book(
                   categoryId: 1,
                   bookTiile: item["name"],
                   bookIcon: Icons.book,
-                  bookCount: 110,
+                  bookCount: item["count"],
                 );
               }).toList(),
         ),

@@ -331,11 +331,9 @@ Future<void> getUserLastData() async {
 }
 
 // 登陆成之后初始化
-void loginInit(context, String token) async {
+void loginInit(String token) async {
   // 将token存储起来
   await TokenOp.writeToken(token);
   // 2. 发送请求，获取用户数据
   getUserLastData();
-  // 1. 跳转到首页
-  context.go("/content");
 }

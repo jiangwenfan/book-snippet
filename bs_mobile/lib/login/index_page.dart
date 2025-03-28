@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:bs_mobile/utils.dart';
-import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:bs_mobile/api_data.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bs_mobile/login/index_widgets.dart';
-import 'package:bs_mobile/utils.dart';
-import './utils.dart';
 
 // 登陆首页
 class LoginIndexPage extends HookWidget {
@@ -69,6 +63,7 @@ class LoginIndexPage extends HookWidget {
 
 // 其他登陆方式的main
 class OtherSignAction extends HookWidget {
+  const OtherSignAction({super.key});
   @override
   Widget build(BuildContext context) {
     return CupertinoActionSheet(

@@ -13,21 +13,22 @@ class ContentPage extends HookWidget {
     ValueNotifier<List<dynamic>> content,
   ) async {
     final res = await SharedPreferenceOp.readPartContent();
-
-    // 更新到当前状态
-    isLoading.value = false;
     if (res != null) {
       content.value = res["results"];
     }
-    print("从 local 读取[部分content]数据: $res");
+
+    // 更新到当前状态
+    isLoading.value = false;
+    print("snippet-从local读取数据成功: ${res?.length}");
   }
 
   Future<void> getRemoteData(
     ValueNotifier<bool> isLoading,
     ValueNotifier<List<dynamic>> content,
   ) async {
+    print("snippet-从remote读取-写入数据到本地-start-....");
     await getUserLastData();
-    print("从 remote 读取[所有数据]保存到local");
+    print("snippet-从remote读取-写入数据到本地-end-成功");
 
     await getLocalData(isLoading, content);
   }
@@ -91,7 +92,7 @@ class ContentPage extends HookWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: BottomInfo(count: 154),
+            child: BottomInfo(count: contentData.value.length),
             // Container(width: 100, height: 100, color: Colors.green),
           ),
         ],

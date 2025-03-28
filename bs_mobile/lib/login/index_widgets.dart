@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:bs_mobile/utils.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/cupertino.dart';
-import './utils.dart';
+import 'package:bs_mobile/login/utils.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bs_mobile/utils.dart';
 
 // 微信登陆widget
 class WeChatSign extends HookWidget {
+  const WeChatSign({super.key});
+
   @override
   Widget build(BuildContext context) {
     return LoginButton(
+      // TODO 修改icon
       loginIcon: Icon(Icons.circle),
       loginText: "通过 微信 登陆",
       loginFunction: () {
@@ -21,6 +24,8 @@ class WeChatSign extends HookWidget {
 
 // 显示app的logo
 class AppLogo extends HookWidget {
+  const AppLogo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -77,6 +82,8 @@ class ReadmeWidget extends HookWidget {
 
 // Apple登陆widget
 class AppleSign extends HookWidget {
+  const AppleSign({super.key});
+
   @override
   Widget build(BuildContext context) {
     return LoginButton(
@@ -91,11 +98,29 @@ class AppleSign extends HookWidget {
 
 // google登陆action
 class GoogleSignAction extends HookWidget {
+  const GoogleSignAction({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CupertinoActionSheetAction(
       onPressed: () async {
-        handleGoogleSign(context);
+        final status = await handleGoogleSign();
+        if (status) {
+          // 1. 获取用户数据
+          getUserLastData();
+          print("登陆-google成功-获取用户数据");
+
+          // 2. 跳转到首页
+          context.go("/snippet");
+          print("登陆-google成功-跳转到snippet页面");
+        }
+        // 确保 widget 仍然挂载（未被销毁）
+        // Future.microtask(() {
+        //   context.go("/snippet");
+        // });
+
+        // 2. 关闭当前页面
+        // Navigator.pop(context);
       },
       child: const Text("通过 google 登陆"),
     );
@@ -104,6 +129,8 @@ class GoogleSignAction extends HookWidget {
 
 // 手机号登录action
 class PhoneSignAction extends HookWidget {
+  const PhoneSignAction({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CupertinoActionSheetAction(

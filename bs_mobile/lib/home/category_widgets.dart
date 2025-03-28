@@ -37,21 +37,14 @@ class ShowAllLabelsWidget extends HookWidget {
         runSpacing: 4.0,
         children:
             labels.value.map((label) {
-              // TODO 点击labels进行跳转，跳转到该标签下的书摘列表
-              // List<Widget> buildLabels(ValueNotifier<List<dynamic>> allLabels) {
-              //   return allLabels.value.map<Widget>((item) {
-              //     return TextButton(
-              //       onPressed: () {
-              //         final label = item["name"];
-              //       },
-              //       child: Text(item["name"]),
-              //     );
-              //   }).toList();
-              // }
+              return TextButton(
+                onPressed: () {
+                  //  TODO 点击labels进行跳转，跳转到该标签下的书摘列表
+                  print("category-跳转到 $label 标签下的书摘列表");
 
-              return Chip(
-                label: Text(label),
-                backgroundColor: Colors.blue[100],
+                  // GoRouter.of(context).go("/content");
+                },
+                child: Text(label),
               );
             }).toList(),
       ),

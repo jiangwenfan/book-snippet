@@ -4,30 +4,35 @@ import 'package:bs_mobile/api_data.dart';
 import 'package:bs_mobile/utils.dart';
 
 // 处理google登陆操作
-Future<void> handleGoogleSign(BuildContext context) async {
+Future<bool> handleGoogleSign() async {
   final GoogleSignIn googleSign = GoogleSignIn();
 
   try {
     final GoogleSignInAccount? account = await googleSign.signIn();
     if (account == null) {
-      return;
+      return false;
     }
 
     final GoogleSignInAuthentication authentication =
         await account.authentication;
     final String? idToken = authentication.idToken;
     if (idToken == null) {
-      return;
+      return false;
     }
 
-    print("向后端发送idToken.....${idToken}");
+    print("登陆-google-idToken长度:${idToken.length}");
     final response = await ApiData.googleLogin(idToken);
+
     // {token: xxxx}
     final responseData = response as Map<String, dynamic>;
-    print("google登陆成功...${responseData}");
+    print("登陆-google-登陆成功,token长度${responseData["token"].length}");
 
-    loginInit(context, responseData["token"]);
+    loginInit(responseData["token"]);
+    print("登陆-google-登陆成功,token已保存");
+
+    return true;
   } catch (e) {
-    print("google登陆错误...${e}");
+    print("登陆-google-登陆失败:${e.toString()}");
+    return false;
   }
 }
