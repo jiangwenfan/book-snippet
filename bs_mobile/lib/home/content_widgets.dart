@@ -11,6 +11,7 @@ class UserCenterButton extends HookWidget {
       icon: Icon(Icons.people),
       onPressed: () {
         // 进入用户页面
+        // print("点击-用户中心");
         GoRouter.of(context).go("/user");
       },
     );

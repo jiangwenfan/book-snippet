@@ -1,3 +1,5 @@
+import 'package:bs_mobile/home/category_page.dart';
+import 'package:bs_mobile/home/content_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -66,17 +68,20 @@ class TitleWidget extends HookWidget {
 class BottomInfoBase extends HookWidget {
   final Widget? widget1;
   final Widget? widget2;
+  final Widget table;
   const BottomInfoBase({
     super.key,
     required this.widget1,
     required this.widget2,
+    required this.table,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
-      decoration: BoxDecoration(color: Colors.grey),
+      height: 80,
+      // 底部控制栏的背景色
+      decoration: BoxDecoration(color: Color.fromARGB(243, 247, 247, 247)),
       child: Row(
         mainAxisAlignment:
             widget1 == null
@@ -91,10 +96,14 @@ class BottomInfoBase extends HookWidget {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
-                builder: (context) => AddItem(),
+                builder: (context) => table,
               );
             },
-            icon: Icon(Icons.add, size: 45),
+            icon: Icon(
+              Icons.add,
+              size: 30,
+              color: Color.fromARGB(255, 1, 123, 253),
+            ),
           ),
         ],
       ),
@@ -103,69 +112,409 @@ class BottomInfoBase extends HookWidget {
 }
 
 class BottomInfo extends HookWidget {
-  final int count;
-  const BottomInfo({super.key, required this.count});
+  final ValueNotifier<List<dynamic>> contentData;
+  final ValueNotifier<bool> isLoading;
+  const BottomInfo({
+    super.key,
+    required this.isLoading,
+    required this.contentData,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BottomInfoBase(
-      widget1: Icon(Icons.arrow_circle_up, size: 45),
-      widget2: Text("$count个项目", style: TextStyle(fontSize: 20)),
+      widget1: Icon(
+        Icons.import_export,
+        size: 30,
+        color: Color.fromARGB(255, 1, 123, 253),
+      ),
+      widget2: Text(
+        "${contentData.value.length}个项目",
+        style: TextStyle(fontSize: 17),
+      ),
+      table: AddItem(contentData: contentData, isLoading: isLoading),
+    );
+  }
+}
+
+// 单个labels显示的widget
+class ShowLabelWidget extends HookWidget {
+  final Map<String, dynamic> label;
+  final int index;
+  final Function updateFunction;
+  const ShowLabelWidget({
+    super.key,
+    required this.label,
+    required this.index,
+    required this.updateFunction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        print("addSnippetFrom--点击标签 $label");
+        updateFunction(index, !label["checked"]);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color:
+              label["checked"]
+                  ? Color.fromARGB(255, 0, 123, 255)
+                  : Color.fromARGB(255, 238, 238, 240),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: EdgeInsets.all(5),
+        padding: EdgeInsets.all(5),
+        child: Text(
+          "#${label["name"]}",
+          style: TextStyle(
+            color:
+                label["checked"]
+                    ? Colors.white
+                    : Color.fromARGB(255, 133, 132, 139),
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+}
+
+// 显示所有labels
+class ShowAllLabelsWidget extends HookWidget {
+  /*
+    [
+      {
+       name:"aaa",
+       checked: false
+      }
+    ]
+  */
+  final ValueNotifier<List<Map<String, dynamic>>> labels;
+  const ShowAllLabelsWidget({super.key, required this.labels});
+
+  List<Widget> buildLabels(ValueNotifier<List<Map<String, dynamic>>> labels) {
+    List<Widget> labelWidgets = [];
+
+    labels.value.asMap().forEach((index, value) {
+      labelWidgets.add(
+        ShowLabelWidget(
+          label: value,
+          index: index,
+          updateFunction: updateLabel,
+        ),
+      );
+    });
+    return labelWidgets;
+  }
+
+  // 更新指定label
+  void updateLabel(int index, bool checked) {
+    final oldLabels =
+        List.from(
+          labels.value,
+        ).map((e) => {"name": e["name"], "checked": e["checked"]}).toList();
+
+    oldLabels[index]["checked"] = checked;
+
+    labels.value = oldLabels;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (labels.value.isNotEmpty) {
+      print("addSnippetFrom--显示labels--item结构-${labels.value[0]}");
+    }
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      margin: EdgeInsets.fromLTRB(10, 5, 10, 10),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Wrap(
+        spacing: 1,
+        runSpacing: 1,
+        children: labels.value.isEmpty ? [] : buildLabels(labels),
+      ),
+    );
+  }
+}
+
+// 输入创建标签widget
+class CreateLabelWidget extends HookWidget {
+  final ValueNotifier<List<Map<String, dynamic>>> allLabels;
+  final TextEditingController _controller = TextEditingController();
+
+  CreateLabelWidget({super.key, required this.allLabels});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      // margin: EdgeInsets.all(10),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+      child: TextField(
+        controller: _controller,
+        onChanged: (value) {
+          if (value.endsWith(" ")) {
+            // 生成最新的标签
+            final oldValues =
+                List.from(allLabels.value)
+                    .map((e) => {"name": e["name"], "checked": e["checked"]})
+                    .toList();
+            oldValues.add({"name": value, "checked": false});
+
+            allLabels.value = oldValues;
+
+            // 清空输入框
+            _controller.clear();
+          }
+        },
+        decoration: InputDecoration(
+          hintText: "添加新标签...",
+          hintStyle: TextStyle(color: Color.fromARGB(255, 197, 197, 199)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+// form表单文本
+class FormText extends HookWidget {
+  final String text;
+  const FormText({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 10, 10, 0),
+      alignment: Alignment.topLeft,
+      child: Text(
+        text,
+        style: TextStyle(color: Color.fromARGB(255, 133, 132, 138)),
+      ),
     );
   }
 }
 
 // bottom 添加书摘widget
 class AddItem extends HookWidget {
-  const AddItem({super.key});
+  final ValueNotifier<List<dynamic>> contentData;
+  final ValueNotifier<bool> isLoading;
+
+  AddItem({super.key, required this.isLoading, required this.contentData});
+
   @override
   Widget build(BuildContext context) {
+    final text = useState("");
+    // final category = useState(0);
+    // final labels = useState([""]);
+
+    // 当前表单使用
+    final currentIsLoading = useState(true);
+    // [{id: 8, name: 书本1221212, owner: 2, created_dt: 2025-03-29T06:15:27.857252Z, updated_dt: 2025-03-29T06:15:27.857288Z, count: 2},
+    final allCategoryRaw = useState([]);
+    // [{id: 8, name: 书本1221212,
+    final allCategoryShow = useState<List<Map<String, dynamic>>>([{}]);
+    final selectedCategoryId = useState<int?>(null);
+    // 格式: [{id: 6, name: 34, owner: 2, created_dt: 2025-03-29T06:42:50.025311Z, updated_dt: 2025-03-29T06:42:50.025326Z, count: 1},
+    final allLabelsRaw = useState([]);
+    final allLabelShow = useState<List<Map<String, dynamic>>>([{}]);
+
+    useEffect(() {
+      // 获取全部标签
+      loadData(currentIsLoading, allCategoryRaw, allLabelsRaw);
+    }, []);
+
+    useEffect(() {
+      // 将原生类型处理为显示类型
+      allLabelShow.value =
+          allLabelsRaw.value
+              .map((e) => {"name": e["name"], "checked": false})
+              .toList();
+    }, [allLabelsRaw.value]);
+
+    useEffect(() {
+      // print("---allCategoryRaw.value: ${allCategoryRaw.value}");
+      // 将原生类型处理为显示类型
+      allCategoryShow.value =
+          allCategoryRaw.value
+              .map((e) => {"id": e["id"], "name": e["name"]})
+              .toList();
+    }, [allCategoryRaw.value]);
+
     return Container(
       width: double.infinity,
       height: 600,
-      decoration: BoxDecoration(color: Colors.grey),
+      decoration: BoxDecoration(color: Color.fromARGB(255, 243, 242, 248)),
       child: Column(
         children: [
-          // Container(
-          //   width: double.infinity,
-          //   height: 200,
-          //   margin: EdgeInsets.all(10),
-          //   padding: EdgeInsets.all(10),
-          //   decoration: BoxDecoration(
-          //     color: Colors.yellow,
-          //     borderRadius: BorderRadius.circular(10),
-          //   ),
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.start,
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [],
-          //   ),
-          // ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // 1. form表单标题
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("书摘句子"),
-              Container(
-                width: double.infinity,
-                height: 200,
-                margin: EdgeInsets.all(10),
-                // padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.yellow,
-                  borderRadius: BorderRadius.circular(10),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "取消",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 8, 123, 245),
+                    fontSize: 15,
+                  ),
                 ),
-                child: TextField(
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: "请输入书摘句子",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(3),
-                    ),
+              ),
+              Text(
+                "新建书摘",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  // 添加书摘
+                  print(
+                    "添加书摘--${text.value}, ${selectedCategoryId.value}, ${allLabelShow.value}",
+                  );
+                  // 获取到所有已经被选择的labels
+                  final labelsSelected = <String>[];
+                  allLabelShow.value.forEach((item) {
+                    if (item["checked"] == true) {
+                      labelsSelected.add(item["name"]);
+                    }
+                  });
+
+                  if (selectedCategoryId.value == null) {
+                    showSimpleDialogWidget(
+                      context: context,
+                      title: "提示",
+                      content: "请选择分类",
+                    );
+                    return;
+                  }
+
+                  await ApiData.createContent(
+                    text.value,
+                    selectedCategoryId.value as int,
+                    labelsSelected,
+                  );
+                  // 重新获取数据
+                  loadContentData(isLoading, contentData, null);
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "添加",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 8, 123, 245),
+                    fontSize: 15,
                   ),
                 ),
               ),
             ],
+          ),
+
+          // 2. 分类相关布局
+          Container(
+            padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+            // width: 600,
+            child: DropdownButton(
+              items:
+                  allCategoryShow.value.map((item) {
+                    return DropdownMenuItem(
+                      value: item["id"],
+                      child: Text(item["name"]),
+                    );
+                  }).toList(),
+
+              value: selectedCategoryId.value,
+              onChanged: (value) {
+                selectedCategoryId.value = value as int?;
+                // category.value = value;
+                print("选择分类: $value ${value.runtimeType}");
+              },
+              isExpanded: true, // 让按钮填满宽度
+              dropdownColor: Colors.white, // 修改背景颜色
+              hint: Text("选择分类"),
+            ),
+          ),
+
+          // 3. 标签相关布局
+          Column(
+            children: [
+              // 显示标签文本
+              FormText(text: "标签"),
+
+              // 显示所有标签
+              ShowAllLabelsWidget(labels: allLabelShow),
+              // 输入创建标签
+              CreateLabelWidget(allLabels: allLabelShow),
+            ],
+          ),
+
+          SizedBox(height: 15),
+
+          // 4. 书摘句子输入框
+          FormText(text: "书摘句子"),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              height: 100,
+              margin: EdgeInsets.all(10),
+              // padding: EdgeInsets.all(10),
+              // decoration: BoxDecoration(
+              //   color: Colors.yellow,
+              //   borderRadius: BorderRadius.circular(10),
+              // ),
+              child: TextField(
+                maxLines: 3,
+                onChanged: (value) => text.value = value,
+
+                decoration: InputDecoration(
+                  hintText: "添加书摘句子",
+                  hintStyle: TextStyle(
+                    color: Color.fromARGB(255, 197, 197, 199),
+                  ),
+
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
           ),
         ],
       ),

@@ -25,7 +25,7 @@ class AllTitleWidget extends HookWidget {
 
 // 显示所有标签的widget
 class ShowAllLabelsWidget extends HookWidget {
-  final ValueNotifier<List<String>> labels;
+  final ValueNotifier<List<dynamic>> labels;
   const ShowAllLabelsWidget({super.key, required this.labels});
 
   @override
@@ -39,11 +39,11 @@ class ShowAllLabelsWidget extends HookWidget {
             labels.value.map((label) {
               return TextButton(
                 onPressed: () {
-                  String path = "/snippet?labels=$label";
+                  String path = "/snippet?labels=${label["name"]}";
                   GoRouter.of(context).go(path);
                   print("category-跳转到 $path 标签下的书摘列表");
                 },
-                child: Text(label),
+                child: Text(label["name"]),
               );
             }).toList(),
       ),

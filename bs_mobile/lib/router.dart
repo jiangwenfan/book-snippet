@@ -17,7 +17,7 @@ final GoRouter router = GoRouter(
       path: "/snippet",
       builder: (context, state) {
         final queryPara = state.uri.queryParameters;
-        print("snippet-query参数: ${queryPara}");
+        print("router-snippet-query参数: ${queryPara}");
         return ContentPage(queryPara: queryPara);
       },
     ),

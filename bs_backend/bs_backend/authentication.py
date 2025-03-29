@@ -13,7 +13,7 @@ class BSJWTAuthentication(JWTAuthentication):
         try:
             user_id = validated_token[api_settings.USER_ID_CLAIM]
             # user_id
-            logging.error(f"----u:{api_settings.USER_ID_CLAIM} user_id: {user_id}")
+            # logging.error(f"----u:{api_settings.USER_ID_CLAIM} user_id: {user_id}")
         except KeyError:
             raise InvalidToken("Token contained no recognizable user identification")
 

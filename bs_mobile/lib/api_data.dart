@@ -17,6 +17,25 @@ class ApiData {
   );
   // static final String baseUrl = "http://localhost:8080";
 
+  // **静态构造函数**，在类加载时执行一次
+  static void _initialize() {
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (DioException e, ErrorInterceptorHandler handler) {
+          if (e.response?.statusCode == 400) {
+            print("🔥 400 错误: ${e.response?.data}");
+          }
+          return handler.next(e);
+        },
+      ),
+    );
+  }
+
+  // **保证静态构造函数执行**
+  static void init() {
+    _initialize();
+  }
+
   static Future<dynamic> googleLogin(String idToken) async {
     final Response response = await dio.get(
       "/users/login-oauth2-google?id_token=$idToken",
@@ -45,6 +64,7 @@ class ApiData {
         headers: {"Authorization": "Bearer ${await TokenOp.readToken()}"},
       ),
     );
+    print("创建分类数据...${response.data}");
     return response.data;
   }
 
@@ -102,23 +122,19 @@ class ApiData {
 
   // 创建用户的内容数据
   static Future<dynamic> createContent(
-    String title,
     String content,
-    String categoryId,
+    int categoryId,
     List<String> tags,
   ) async {
+    ApiData.init();
     final Response response = await dio.post(
-      "/contents/",
-      data: {
-        "title": title,
-        "content": content,
-        "category_id": categoryId,
-        "tags": tags,
-      },
+      "/snippets/",
+      data: {"text": content, "category": categoryId, "labels": tags},
       options: Options(
         headers: {"Authorization": "Bearer ${await TokenOp.readToken()}"},
       ),
     );
+    print("创建内容数据...${response.data}");
     return response.data;
   }
 
