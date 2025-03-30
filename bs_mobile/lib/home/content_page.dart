@@ -5,16 +5,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import './content_widgets.dart';
 
 Future<void> refreshContentByCategory(
-  String category,
+  String categoryId,
   ValueNotifier<List<dynamic>> content,
 ) async {
   final resByCategory = await SharedPreferenceOp.readContentByCategory(
-    categoryId: category,
+    categoryId: categoryId,
   );
   if (resByCategory != null) {
     content.value = resByCategory["results"];
   }
-  print("snippet-category过滤-从local读取数据成功: ${resByCategory?.length}");
+  print("snippet-category过滤-从local读取数据成功: ${resByCategory?['results']}");
 }
 
 Future<void> refreshContentByLabels(
@@ -36,18 +36,13 @@ Future<void> getLocalData(
   Map<String, String>? queryPara,
 ) async {
   if (queryPara != null &&
-      queryPara.containsKey("category") &&
-      queryPara["category"] != null) {
+      queryPara.containsKey("categoryId") &&
+      queryPara["categoryId"] != null) {
     // 存在分类参数
-    final category = queryPara["category"]!;
+    final category = queryPara["categoryId"]!;
 
     // 从本地读取数据
     await refreshContentByCategory(category, content);
-
-    // 从远程读取最新数据
-    await getUserLastDataByCategory(category);
-    await refreshContentByCategory(category, content);
-    print("snippet-category过滤-从remote读取数据成功");
 
     return;
   }
@@ -59,11 +54,6 @@ Future<void> getLocalData(
 
     // 从本地读取数据
     await refreshContentByLabels(labels, content);
-
-    // 从remote读取最新数据
-    await getUserLastDataByLabels(labels);
-    await refreshContentByLabels(labels, content);
-    print("snippet-labels过滤-从remote读取数据成功");
 
     return;
   }
@@ -83,6 +73,29 @@ Future<void> getRemoteData(
   ValueNotifier<List<dynamic>> content,
   Map<String, String>? queryPara,
 ) async {
+  if (queryPara != null &&
+      queryPara.containsKey("categoryId") &&
+      queryPara["categoryId"] != null) {
+    // 存在分类参数
+    final category = queryPara["categoryId"]!;
+
+    // 从远程读取最新数据
+    await getUserLastDataByCategory(category);
+    await refreshContentByCategory(category, content);
+    print("snippet-category过滤-从remote读取数据成功");
+    return;
+  }
+  if (queryPara != null &&
+      queryPara.containsKey("labels") &&
+      queryPara["labels"] != null) {
+    // 存在标签参数
+    final labels = queryPara["labels"]!;
+    // 从remote读取最新数据
+    await getUserLastDataByLabels(labels);
+    await refreshContentByLabels(labels, content);
+    print("snippet-labels过滤-从remote读取数据成功");
+    return;
+  }
   print("snippet-从remote读取-写入数据到本地-start-....");
   await getUserLastData();
   print("snippet-从remote读取-写入数据到本地-end-成功");
@@ -95,11 +108,20 @@ Future<void> loadContentData(
   ValueNotifier<List<dynamic>> contentData,
   Map<String, String>? queryPara,
 ) async {
+  final Map<String, String>? queryParaNew;
+  // 如果categoryId是0,则清空
+  if (queryPara != null &&
+      queryPara.containsKey("categoryId") &&
+      queryPara["categoryId"] == "0") {
+    queryParaNew = {};
+  } else {
+    queryParaNew = queryPara;
+  }
   // 1.1 从本地/全局读取数据，显示
-  await getLocalData(isLoading, contentData, queryPara);
+  await getLocalData(isLoading, contentData, queryParaNew);
 
   // 1.2 获取最新数据
-  await getRemoteData(isLoading, contentData, queryPara);
+  await getRemoteData(isLoading, contentData, queryParaNew);
 }
 
 class ContentPage extends HookWidget {
@@ -111,21 +133,43 @@ class ContentPage extends HookWidget {
     final isLoading = useState(false);
     final contentData = useState([]);
 
+    final contentTile = useState("全部");
+
     useEffect(() {
       // 当页面加载时，
       loadContentData(isLoading, contentData, queryPara);
+
+      if (queryPara.containsKey("categoryName")) {
+        contentTile.value = queryPara["categoryName"]!;
+      } else if (queryPara.containsKey("labelsName")) {
+        contentTile.value = "#${queryPara["labelsName"]!}";
+      }
     }, []);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("书摘"),
+        title: GestureDetector(
+          onTap: () => GoRouter.of(context).go("/category"),
+          child: Text(
+            "书摘",
+            style: TextStyle(color: Color.fromARGB(255, 3, 123, 255)),
+          ),
+        ),
         centerTitle: false,
-        leading: IconButton(
-          onPressed: () {
-            // 进入分类页面
-            GoRouter.of(context).go("/category");
-          },
-          icon: Icon(Icons.arrow_back),
+        leadingWidth: 10,
+
+        leading: Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: IconButton(
+            onPressed: () {
+              // 进入分类页面
+              print("点击-返回分类页面");
+              GoRouter.of(context).go("/category");
+            },
+            icon: Icon(Icons.arrow_back_ios),
+            style: IconButton.styleFrom(padding: EdgeInsets.zero),
+            color: Color.fromARGB(255, 3, 123, 255),
+          ),
         ),
         actions: [
           // 1. 用户中心按钮
@@ -133,7 +177,9 @@ class ContentPage extends HookWidget {
 
           // 2. 全选按钮
           IconButton(
-            icon: Icon(Icons.check_circle_outline),
+            icon: Icon(Icons.checklist_rounded),
+            color: Color.fromARGB(255, 3, 123, 255),
+            iconSize: 30,
             onPressed: () {
               print("点击-全选");
             },
@@ -142,14 +188,23 @@ class ContentPage extends HookWidget {
       ),
       body: Stack(
         children: [
-          // 1. 标题
-          ContentTitle(title: "全部"),
+          Column(
+            children: [
+              // 1. 标题
+              ContentTitle(title: contentTile.value),
+              // 2. 搜索框
+              SearchWidget(isLoading: isLoading),
+              SizedBox(height: 20),
 
-          // 2. 搜索框
-          SearchWidget(isLoading: isLoading),
-
-          // 3. 内容列表
-          ContentWidget(isLoading: isLoading, contentData: contentData),
+              Expanded(
+                child: // 3. 内容列表
+                    ContentWidget(
+                  isLoading: isLoading,
+                  contentData: contentData,
+                ),
+              ),
+            ],
+          ),
 
           // 显示底部控制栏
           Positioned(
@@ -176,14 +231,29 @@ class ContentWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = contentData.value;
+    final content =
+        contentData.value
+            .map(
+              (e) => {
+                "text": e["text"],
+                "labels": e["labels"],
+                // "labels": e["labels"].map((label) => label["name"]).toList(),
+              },
+            )
+            .toList();
 
     return isLoading.value
         ? CircularProgressIndicator()
         : ListView.builder(
           itemCount: content.length,
           itemBuilder: (context, index) {
-            return Item(text: content[index]["text"]);
+            final List<dynamic> labelsRaw = content[index]["labels"];
+            // print("==== $labelsRaw ${labelsRaw.runtimeType}");
+            final List<String> labels =
+                labelsRaw.map((labelName) => labelName.toString()).toList();
+            // print("==== $labels ${labels.runtimeType}");
+
+            return Item(text: content[index]["text"], labels: labels);
           },
         );
   }

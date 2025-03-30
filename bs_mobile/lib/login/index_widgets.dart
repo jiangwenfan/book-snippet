@@ -31,7 +31,7 @@ class AppLogo extends HookWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Image.asset(
-          'assets/images/logo.png',
+          'assets/images/logo2.png',
           fit: BoxFit.cover,
           width: 200,
           height: 200,
@@ -104,6 +104,7 @@ class GoogleSignAction extends HookWidget {
     return CupertinoActionSheetAction(
       onPressed: () async {
         final status = await handleGoogleSign();
+        // final status = await handleGoogleSign();
         if (status) {
           // 1. 获取用户数据
           getUserLastData();

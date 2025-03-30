@@ -4,7 +4,8 @@ import 'package:bs_mobile/utils.dart';
 class ApiData {
   static final Dio dio = Dio(
     BaseOptions(
-      baseUrl: "http://localhost:8080",
+      // baseUrl: "http://localhost:8080",
+      baseUrl: "http://192.168.1.11:8080",
       connectTimeout: Duration(seconds: 5),
       receiveTimeout: Duration(seconds: 5),
       headers: {
@@ -101,7 +102,9 @@ class ApiData {
 
   // 根据category_id获取内容
   static Future<dynamic> getContentByCategoryId(String categoryId) async {
-    final res = await _getContentBase({"category_id": categoryId});
+    final res = await _getContentBase({"category": categoryId});
+    // 获取完整的url
+    // print("url:")
     print("根据category_id获取内容...${res}");
     return res;
   }

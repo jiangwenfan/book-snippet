@@ -21,6 +21,7 @@ class BasePage extends HookWidget {
         toolbarHeight: 130,
         // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: title,
+        titleSpacing: 0, // 取消左右间距
       ),
 
       body: widget,
@@ -37,11 +38,10 @@ class SearchWidget extends HookWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(10),
-
       child: TextField(
         readOnly: isLoading.value ? true : false,
         decoration: InputDecoration(
-          hintText: "搜索书摘",
+          hintText: "搜索",
           prefixIcon: Icon(Icons.search),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
@@ -96,7 +96,18 @@ class BottomInfoBase extends HookWidget {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
+                useSafeArea: true,
+                isScrollControlled: true, // 允许自定义高度
                 builder: (context) => table,
+                // builder:
+                //     (context) => SingleChildScrollView(
+                //       child: Padding(
+                //         padding: EdgeInsets.only(
+                //           bottom: MediaQuery.of(context).viewInsets.bottom,
+                //         ),
+                //         child: table,
+                //       ),
+                //     ),
               );
             },
             icon: Icon(
@@ -364,10 +375,10 @@ class AddItem extends HookWidget {
     }, [allCategoryRaw.value]);
 
     return Container(
-      width: double.infinity,
-      height: 600,
+      // width: double.infinity,
+      // height: 700,
       decoration: BoxDecoration(color: Color.fromARGB(255, 243, 242, 248)),
-      child: Column(
+      child: ListView(
         children: [
           // 1. form表单标题
           Row(

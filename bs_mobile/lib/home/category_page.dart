@@ -92,29 +92,50 @@ List<Widget> showMainWidget(
   if (testL.isNotEmpty) {
     print("categoty-labels item结构: ${testL[0].toString()}");
   }
+  final allCategoryValue = [
+    {"id": 0, "name": "全部", "count": 999},
+    ...allCategory.value,
+  ];
 
   return isLoading.value
       ? [CircularProgressIndicator()]
       : [
-        GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 20 / 10,
-          padding: EdgeInsets.all(10),
-          children:
-              allCategory.value.map<Widget>((item) {
-                return Book(
-                  categoryId: 1,
-                  bookTiile: item["name"],
-                  bookIcon: Icons.book,
-                  bookCount: item["count"],
-                );
-              }).toList(),
-        ),
+        ListView(
+          children: [
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              childAspectRatio: 20 / 10,
+              padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+              shrinkWrap: true, // 让 GridView 适应内容大小
+              physics: NeverScrollableScrollPhysics(), // 禁用 GridView 自己的滚动
+              children:
+                  allCategoryValue.map<Widget>((item) {
+                    return Book(
+                      categoryId: item["id"],
+                      bookTiile: item["name"],
 
-        // 显示所有labels
-        // ShowAllLabelsWidget(labels: allLabels),
+                      bookCount: item["count"],
+                    );
+                  }).toList(),
+            ),
+
+            SizedBox(height: 20),
+
+            // 显示标签
+            Container(
+              margin: EdgeInsets.fromLTRB(14, 0, 14, 6),
+              alignment: Alignment.topLeft,
+              child: Text(
+                "标签",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            // 显示所有labels
+            ShowAllLabelsOfCategoryWidget(labels: allLabels),
+          ],
+        ),
 
         // 显示底部控制栏
         Positioned(
@@ -123,8 +144,8 @@ List<Widget> showMainWidget(
           right: 0,
           child: // 底部工具栏
               BottomInfoBase(
-            widget1: null,
-            widget2: null,
+            widget1: SizedBox(),
+            widget2: SizedBox(),
             table: AddCategoryForm(
               isLoading: isLoading,
               allCategory: allCategory,
@@ -190,6 +211,55 @@ class AddCategoryForm extends HookWidget {
           //   decoration: InputDecoration(labelText: "分类描述", hintText: "请输入分类描述"),
           // ),
         ],
+      ),
+    );
+  }
+}
+
+// 显示所有labels的widget
+class ShowAllLabelsOfCategoryWidget extends HookWidget {
+  final ValueNotifier<List<dynamic>> labels;
+  const ShowAllLabelsOfCategoryWidget({super.key, required this.labels});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(14, 0, 14, 0),
+      padding: EdgeInsets.all(10),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 255, 255, 255),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Wrap(
+        spacing: 8.0,
+        runSpacing: 4.0,
+        children:
+            labels.value.map((label) {
+              return GestureDetector(
+                onTap: () {
+                  // 跳转到书摘列表
+                  String path =
+                      "/snippet?labels=${label["name"]}&labelsName=${label["name"]}";
+                  GoRouter.of(context).go(path);
+                  print("category-跳转到 $path 标签下的书摘列表");
+                },
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 238, 238, 240),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    "#${label["name"]}",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 133, 132, 137),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
       ),
     );
   }

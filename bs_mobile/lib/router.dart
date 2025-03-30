@@ -4,6 +4,7 @@ import 'package:bs_mobile/login/index_page.dart';
 import 'package:bs_mobile/home/category_page.dart';
 import 'package:bs_mobile/user/user_page.dart';
 import 'package:bs_mobile/utils.dart';
+import 'package:flutter/material.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: "/snippet",
@@ -22,7 +23,34 @@ final GoRouter router = GoRouter(
       },
     ),
     // 分类页
-    GoRoute(path: "/category", builder: (context, state) => CategoryPage()),
+    // GoRoute(path: "/category", builder: (context, state) => CategoryPage()),
+    GoRoute(
+      path: "/category",
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+            child: CategoryPage(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              const begin = Offset(-1.0, 0.0); // 从左侧进入
+              const end = Offset.zero;
+              const curve = Curves.easeInOut; // 平滑动画
+
+              var tween = Tween(
+                begin: begin,
+                end: end,
+              ).chain(CurveTween(curve: curve));
+
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(position: offsetAnimation, child: child);
+            },
+            transitionDuration: Duration(milliseconds: 300), // 动画持续时间（慢一点）
+          ),
+    ),
 
     // 用户页
     GoRoute(path: "/user", builder: (context, state) => UserPage()),

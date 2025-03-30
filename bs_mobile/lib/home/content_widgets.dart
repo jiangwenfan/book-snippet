@@ -8,7 +8,7 @@ class UserCenterButton extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.people),
+      icon: Icon(Icons.person),
       onPressed: () {
         // 进入用户页面
         // print("点击-用户中心");
@@ -24,9 +24,13 @@ class ContentTitle extends HookWidget {
   const ContentTitle({super.key, required this.title});
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+    return Container(
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }
@@ -34,22 +38,44 @@ class ContentTitle extends HookWidget {
 //  --- utils ---
 class Item extends HookWidget {
   final String text;
-  const Item({super.key, required this.text});
+  final List<String> labels;
+  const Item({super.key, required this.text, required this.labels});
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.all(10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 20),
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
+      padding: EdgeInsets.fromLTRB(14, 0, 14, 5),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(),
+          Text(
+            text,
+            style: TextStyle(fontSize: 20),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+          Wrap(
+            spacing: 5,
+            children:
+                labels
+                    .map(
+                      (e) => Container(
+                        padding: EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 0, 123, 255),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          "#$e",
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                    )
+                    .toList(),
+          ),
+        ],
       ),
     );
   }

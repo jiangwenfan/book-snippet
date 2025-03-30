@@ -5,18 +5,21 @@ import 'package:bs_mobile/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bs_mobile/api_data.dart';
 import './utils.dart';
+import './content_widgets.dart';
 
 // title widget
 class AllTitleWidget extends HookWidget {
-  ValueNotifier<bool> isLoading = useState(true);
-  AllTitleWidget({super.key, required this.isLoading});
+  final ValueNotifier<bool> isLoading;
+  const AllTitleWidget({super.key, required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        TitleWidget(title: "书摘分类"),
+        ContentTitle(title: "书摘"),
+
+        // TitleWidget(title: "书摘"),
         SearchWidget(isLoading: isLoading),
       ],
     );
@@ -56,53 +59,46 @@ class ShowAllLabelsWidget extends HookWidget {
 class Book extends HookWidget {
   final int categoryId;
   final String bookTiile;
-  final IconData bookIcon;
   final int bookCount;
   const Book({
     super.key,
     required this.categoryId,
     required this.bookTiile,
-    required this.bookIcon,
+
     required this.bookCount,
   });
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        String path = "/snippet?categoryId=$categoryId";
+        String path = "/snippet?categoryId=$categoryId&categoryName=$bookTiile";
         GoRouter.of(context).go(path);
         print("category-跳转到 $path 分类下的书摘列表");
       },
       child: Container(
-        // width: 30,
-        // height: 20,
-        // color: Colors.green,
-        margin: EdgeInsets.all(2),
+        // margin: EdgeInsets.all(2),
+        padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.green,
+          color: Color.fromARGB(255, 255, 255, 255),
         ),
         child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(bookIcon, size: 30),
-                Text(bookTiile, style: TextStyle(fontSize: 15)),
-              ],
+            Expanded(
+              flex: 2,
+              child: Text(bookTiile, style: TextStyle(fontSize: 18)),
             ),
-            Text("$bookCount >"),
-            // Container(
-            //   child: TextButton(
-            //     onPressed: () {
-            //       print("查看该书的所有书摘");
-            //     },
-            //     child: Text("$bookCount >"),
-            //   ),
-
-            //   // margin: EdgeInsets.only(bottom: 45),
-            // ),
+            Expanded(
+              flex: 1,
+              child: Column(
+                children: [
+                  Text(
+                    "$bookCount",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
