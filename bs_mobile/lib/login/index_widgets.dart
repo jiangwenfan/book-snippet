@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:bs_mobile/login/utils.dart';
 import 'package:go_router/go_router.dart';
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 
 // 微信登陆widget
 class WeChatSign extends HookWidget {

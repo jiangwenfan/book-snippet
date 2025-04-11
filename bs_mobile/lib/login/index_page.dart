@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:bs_mobile/login/index_widgets.dart';
 

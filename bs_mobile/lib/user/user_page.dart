@@ -1,4 +1,4 @@
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';

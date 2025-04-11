@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:bs_mobile/api_data.dart';
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 
 // 处理google登陆操作
 Future<bool> handleGoogleSign() async {

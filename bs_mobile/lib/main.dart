@@ -2,7 +2,7 @@ import 'package:bs_mobile/home/content_page.dart';
 import 'package:bs_mobile/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();

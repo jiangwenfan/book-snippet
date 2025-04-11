@@ -1,4 +1,4 @@
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

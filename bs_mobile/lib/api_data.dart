@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 
 class ApiData {
   static final Dio dio = Dio(

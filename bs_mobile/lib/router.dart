@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:bs_mobile/login/index_page.dart';
 import 'package:bs_mobile/home/category_page.dart';
 import 'package:bs_mobile/user/user_page.dart';
-import 'package:bs_mobile/utils.dart';
+import 'package:bs_mobile/common_utils.dart';
 import 'package:flutter/material.dart';
 
 final GoRouter router = GoRouter(
